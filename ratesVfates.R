@@ -2,194 +2,196 @@
 #### 04-18-2017
 #### S.E. Jones, University of Notre Dame
 
-rm(list=ls())
+# ---- arguments ----
+# A:        lake area [m2]
+# zbar:     lake mean depth [m]
+# WA2LA:    watershed area to lake area ratio (drainage ratio)
+# MAP:      mean annual precipitation [m yr-1]
+# ET:       mean daily evapotranspiration rate of catchment [m day-1]
+# evap:     mean daily evaporative loss from lake [m day-1]
+# Cq:       total DOC concentration in inlet [g m-3]
+# Cp:       total DOC concentration in precip [g m-3]
+# d1:       recalcitrant DOC processing rate [day-1]
+# d2:       labile DOC process rate [day-1]
+# fLabile:  fraction of total DOC that is labile in fluvial load
 
-#### arguments
-	# A: lake area [m2]
-	# zbar:  lake mean depth [m]
-	# WA2LA: watershed area to lake area ratio (drainage ratio)
-	# MAP:  mean annual precipitation [m yr-1]
-	# ET: mean daily evapotranspiration rate of catchment [m day-1]
-	# evap:  mean daily evaporative loss from lake [m day-1]
-	# Cq: total DOC concentration in inlet [g m-3]
-	# Cp: total DOC concentration in precip [g m-3]
-	# d1:  recalcitrant DOC processing rate [day-1]
-	# d2:  labile DOC process rate [day-1]
-	# fLabile:  fraction of total DOC that is labile in fluvial load
-			
-rateVfate<-function(A=10000,zbar=10,WA2LA=5,MAP=0.8,ET=0.0014,evap=0.0025,Cq=5,Cp=1,d1=0.005,d2=0.02,fLabile=0){
-	V=zbar*A		# lake volume [m3]
-	WA=A*WA2LA	# watershed area [m2]
+rateVfate <- function(A = 10000, zbar = 10, WA2LA = 5, MAP = 0.8, ET = 0.0014,
+                      evap = 0.0025, Cq = 5, Cp = 1, d1 = 0.005, d2 = 0.02,
+                      fLabile = 0) {
 
-	# hydrology
-	precip=MAP/365			# daily precipitation [m day-1]
-	Qin=(precip-ET)*WA		# inflow to lake [m3 day-1]
-	if(Qin<0){Qin=0}		
-	directP=precip*A		#total direct precip [m3 day-1]
-	Etot=evap*A				#total evap [m3 day-1]
-	Qout=Qin+directP-Etot	#outflow from lake [m3 day-1]
+  V <- zbar * A    # lake volume [m3]
+  WA <- A * WA2LA  # watershed area [m2]
 
-	if(Qout<0){print("Warning: A negative Qout was used")}				# doesn't allow model to run for situation where evaporation would drain the lake
+  #### hydrology
+  precip <- MAP / 365          # daily precipitation [m day-1]
+  Qin <- (precip - ET) * WA    # inflow to lake [m3 day-1]
+  if (Qin < 0) {
+    Qin <- 0
+  }
+  directP <- precip * A            # total direct precip [m3 day-1]
+  Etot    <- evap   * A            # total evap [m3 day-1]
+  Qout    <- Qin + directP - Etot  # outflow from lake [m3 day-1]
 
-	fracEvap=Etot/(Etot+Qout)	# fraction of hydrologic losses due to evaporation
-	RT=V/(Qin+directP)		# residence time [days]
-	
-	C1q=Cq*(1-fLabile)	# concentration of recalcitrant DOC in fluvial inputs
-	C2q=Cq*fLabile		# concentration of labile DOC in fluvial inputs
-	C1p=Cp				# precipitation carries only recalcitrant DOC
-	C2p=0
+  if (Qout < 0){
+    print("Warning: A negative Qout was used")
+  }  # doesn't allow model to run for situation where evap would drain the lake
 
-	# carbon
-	C1star=(Qin*C1q+directP*C1p)/(Qout/V+d1)	# mass of recalcitrant DOC at equilibrium [g C]
-	C2star=(Qin*C2q+directP*C2p)/(Qout/V+d2)	# mass of labile DOC at equilibrium [g C]
-	Cstar=C1star+C2star						# mass of total DOC at equilibrium [g C]
-	C1conc=C1star/V					# recalcitrant DOC concentration at equilibrium [g C m-3]
-	C2conc=C2star/V					# labile DOC concentration at equilibrium [g C m-3]
-	Cconc=C1conc+C2conc				# total DOC concentration at equilibrium [g C m-3]
-	Cload=Qin*Cq+directP*Cp			# daily total DOC load [g day-1]
-	C1load=Qin*C1q+directP*C1p			# daily recalcitrant DOC load [g day-1]
-	C2load=Qin*C2q+directP*C2p			# daily labile DOC load [g day-1]
-	fracCresp=1-Qout*Cconc/Cload		# fraction of DOC load that is decomposed (not exported)
-	resp=C1star*d1+C2star*d2			# total daily respiration at equilibrium [g C day-1]
-	respVol=resp/V				# volumetric daily respiration at equilibrium [g C m-3 day-1]
-	
-	return(as.list(c(A=A,zbar=zbar,WA2LA=WA2LA,MAP=MAP,ET=ET,evap=evap,Cq=Cq,Cp=Cp,d1=d1,d2=d2,V=V,WA=WA,Qin=Qin,directP=directP,Etot=Etot,Qout=Qout,fracEvap=fracEvap,RT=RT,Cstar=Cstar,Cconc=Cconc,Cload=Cload,fracCresp=fracCresp,resp=resp,respVol=respVol)))
+  fracEvap <- Etot / (Etot + Qout)  # fraction of hydrologic losses due to evap
+  RT       <- V / (Qin + directP)   # residence time [days]
+
+  C1q <- Cq * (1 - fLabile)  # concentration of recalcitrant DOC in fluvial inputs
+  C2q <- Cq * fLabile  # concentration of labile DOC in fluvial inputs
+  C1p <- Cp            # precipitation carries only recalcitrant DOC
+  C2p <- 0
+
+  #### carbon
+  C1star <- (Qin * C1q + directP * C1p)/(Qout/V + d1)  # mass of recalcitrant DOC at equilibrium [g C]
+  C2star <- (Qin * C2q + directP * C2p)/(Qout/V + d2)  # mass of labile DOC at equilibrium [g C]
+  Cstar  <- C1star + C2star  # mass of total DOC at equilibrium [g C]
+  C1conc <- C1star / V  # recalcitrant DOC concentration at equilibrium [g C m-3]
+  C2conc <- C2star/V  # labile DOC concentration at equilibrium [g C m-3]
+  Cconc  <- C1conc + C2conc  # total DOC concentration at equilibrium [g C m-3]
+  Cload  <- Qin * Cq + directP * Cp    # daily total DOC load [g day-1]
+  C1load <- Qin * C1q + directP * C1p  # daily recalcitrant DOC load [g day-1]
+  C2load <- Qin * C2q + directP * C2p  # daily labile DOC load [g day-1]
+  fracCresp <- 1 - Qout * Cconc/Cload  # fraction of DOC load that is decomposed (not exported)
+  resp <- C1star * d1 + C2star * d2  # total daily respiration at equilibrium [g C day-1]
+  respVol <- resp/V  # volumetric daily respiration at equilibrium [g C m-3 day-1]
+
+  return(as.list(c(A = A, zbar = zbar, WA2LA = WA2LA, MAP = MAP, ET = ET,
+                   evap = evap, Cq = Cq, Cp = Cp, d1 = d1, d2 = d2, V = V,
+                   WA = WA, Qin = Qin, directP = directP, Etot = Etot,
+                   Qout = Qout, fracEvap = fracEvap, RT = RT, Cstar = Cstar,
+                   Cconc = Cconc, Cload = Cload, fracCresp = fracCresp,
+                   resp = resp, respVol = respVol)))
 }
 
-
-
-
-
-
-
-
-#### (1) simulate over ranges of WA2LAs and zbars
-WA2LAs=seq(0.5,1000,0.5)	# drainage ratios considered
-zbars=1:15					# mean depths considered [m]
+# (1) simulate over ranges of WA2LAs and zbars ----
+WA2LAs <- seq(0.5, 1000, 0.5)  # drainage ratios considered
+zbars  <- 1:15                 # mean depths considered [m]
 
 # matrices for storing equilibrium values
-RT=matrix(NA,length(WA2LAs),length(zbars))
-fracEvap=RT
-fracCresp=RT
-respiration=RT
-respirationVol=RT
-Cload=RT
-fracCresp=RT
-Qout=RT
-equilC=RT
+RT             <- matrix(NA, length(WA2LAs), length(zbars))
+fracEvap       <- RT
+fracCresp      <- RT
+respiration    <- RT
+respirationVol <- RT
+Cload          <- RT
+fracCresp      <- RT
+Qout           <- RT
+equilC         <- RT
 
 # loop over gradients in factorial manner
-for(i in 1:length(WA2LAs)){
-	for(j in 1:length(zbars)){
-		temp=rateVfate(zbar=zbars[j],WA2LA=WA2LAs[i])	# solve for equilbria
-		equilC[i,j]=temp$Cconc				# equilibrium DOC concentration [g m-3]
-		fracEvap[i,j]=temp$fracEvap		# fraction of hydrologic loss that is evap 
-		respiration[i,j]=temp$resp			# daily respiration [g day-1]
-		respirationVol[i,j]=temp$respVol	# daily volumetric respiration [g m-3 day-1]
-		Cload[i,j]=temp$Cload				# daily carbon load [g day-1]
-		fracCresp[i,j]=temp$fracCresp		# fraction of loaded C that is respired
-		RT[i,j]=temp$RT					# residence time [day]
-		Qout[i,j]=temp$Qout				# outflow [m3 day-1]
-	}
+for (i in 1:length(WA2LAs)) {
+  for (j in 1:length(zbars)) {
+    temp <- rateVfate(zbar = zbars[j], WA2LA = WA2LAs[i])  # solve for equilbria
+    equilC[i, j] <- temp$Cconc  # equilibrium DOC concentration [g m-3]
+    fracEvap[i, j] <- temp$fracEvap  # fraction of hydrologic loss that is evap
+    respiration[i, j] <- temp$resp  # daily respiration [g day-1]
+    respirationVol[i, j] <- temp$respVol  # daily volumetric respiration [g m-3 day-1]
+    Cload[i, j] <- temp$Cload  # daily carbon load [g day-1]
+    fracCresp[i, j] <- temp$fracCresp  # fraction of loaded C that is respired
+    RT[i, j] <- temp$RT  # residence time [day]
+    Qout[i, j] <- temp$Qout  # outflow [m3 day-1]
+  }
 }
 
-#### (2) simulate for same gradients as (1) above, but without any evap from lake
+# (2) same as (1) above, without evap from lake ----
 # matrices for storying equilibrium values
-RTNE=matrix(NA,length(WA2LAs),length(zbars))
-fracEvapNE=RT
-fracCrespNE=RT
-respirationNE=RT
-respirationVolNE=RT
-CloadNE=RT
-fracCrespNE=RT
-QoutNE=RT
-equilCNE=RT
+RTNE             <- matrix(NA, length(WA2LAs), length(zbars))
+fracEvapNE       <- RT
+fracCrespNE      <- RT
+respirationNE    <- RT
+respirationVolNE <- RT
+CloadNE          <- RT
+fracCrespNE      <- RT
+QoutNE           <- RT
+equilCNE         <- RT
 
 # loop over gradients in factorial manner
-for(i in 1:length(WA2LAs)){
-	for(j in 1:length(zbars)){
-		temp=rateVfate(zbar=zbars[j],WA2LA=WA2LAs[i],evap=0)	
-		equilCNE[i,j]=temp$Cconc				# equilibrium DOC concentration [g m-3]
-		fracEvapNE[i,j]=temp$fracEvap		# fraction of hydrologic loss that is evap 
-		respirationNE[i,j]=temp$resp			# daily respiration [g day-1]
-		respirationVolNE[i,j]=temp$respVol	# daily volumetric respiration [g m-3 day-1]
-		CloadNE[i,j]=temp$Cload				# daily carbon load [g day-1]
-		fracCrespNE[i,j]=temp$fracCresp		# fraction of loaded C that is respired
-		RTNE[i,j]=temp$RT					# residence time [day]
-		QoutNE[i,j]=temp$Qout				# outflow [m3 day-1]
-	}
+for (i in 1:length(WA2LAs)) {
+  for (j in 1:length(zbars)) {
+    temp <- rateVfate(zbar = zbars[j], WA2LA = WA2LAs[i], evap = 0)
+    equilCNE[i, j] <- temp$Cconc  # equilibrium DOC concentration [g m-3]
+    fracEvapNE[i, j] <- temp$fracEvap  # fraction of hydrologic loss that is evap
+    respirationNE[i, j] <- temp$resp  # daily respiration [g day-1]
+    respirationVolNE[i, j] <- temp$respVol  # daily volumetric respiration [g m-3 day-1]
+    CloadNE[i, j] <- temp$Cload  # daily carbon load [g day-1]
+    fracCrespNE[i, j] <- temp$fracCresp  # fraction of loaded C that is respired
+    RTNE[i, j] <- temp$RT  # residence time [day]
+    QoutNE[i, j] <- temp$Qout  # outflow [m3 day-1]
+  }
 }
 
-#### (3) simulate over ranges of WA2LAs, zbars and inflow DOC concentrations
-DOCins=seq(5,40,5)		# fluvial total DOC concentrations considered [g C m-3]
+# (3) simulate over ranges of WA2LAs, zbars and inflow DOC concentrations ----
+DOCins <- seq(5, 40, 5)  # fluvial total DOC concentrations considered [g C m-3]
 
 # 3-dimensional array to store equilibrium values
-RT3=array(NA,dim=c(length(WA2LAs),length(DOCins),length(zbars)))
-fracEvap3=RT3
-fracCresp3=RT3
-respiration3=RT3
-respirationVol3=RT3
-Cload3=RT3
-fracCresp3=RT3
-Qout3=RT3
-equilC3=RT3
+RT3             <- array(NA, dim = c(length(WA2LAs),
+                                     length(DOCins),
+                                     length(zbars)))
+fracEvap3       <- RT3
+fracCresp3      <- RT3
+respiration3    <- RT3
+respirationVol3 <- RT3
+Cload3          <- RT3
+fracCresp3      <- RT3
+Qout3           <- RT3
+equilC3         <- RT3
 
 # loop over gradients in factorial manner
-for(i in 1:length(WA2LAs)){
-	for(j in 1:length(DOCins)){
-		for(k in 1:length(zbars)){
-			temp=rateVfate(zbar=zbars[k],WA2LA=WA2LAs[i],Cq=DOCins[j])	
-			equilC3[i,j,k]=temp$Cconc				# equilibrium DOC concentration [g m-3]
-			fracEvap3[i,j,k]=temp$fracEvap		# fraction of hydrologic loss that is evap 
-			respiration3[i,j,k]=temp$resp			# daily respiration [g day-1]
-			respirationVol3[i,j,k]=temp$respVol	# daily volumetric respiration [g m-3 day-1]
-			Cload3[i,j,k]=temp$Cload				# daily carbon load [g day-1]
-			fracCresp3[i,j,k]=temp$fracCresp		# fraction of loaded C that is respired
-			RT3[i,j,k]=temp$RT					# residence time [day]
-			Qout3[i,j,k]=temp$Qout				# outflow [m3 day-1]
-		}
-	}
+for (i in 1:length(WA2LAs)) {
+  for (j in 1:length(DOCins)) {
+    for (k in 1:length(zbars)) {
+      temp <- rateVfate(zbar = zbars[k], WA2LA = WA2LAs[i], Cq = DOCins[j])
+      equilC3[i, j, k] <- temp$Cconc  # equilibrium DOC concentration [g m-3]
+      fracEvap3[i, j, k] <- temp$fracEvap  # fraction of hydrologic loss that is evap
+      respiration3[i, j, k] <- temp$resp  # daily respiration [g day-1]
+      respirationVol3[i, j, k] <- temp$respVol  # daily volumetric respiration [g m-3 day-1]
+      Cload3[i, j, k] <- temp$Cload  # daily carbon load [g day-1]
+      fracCresp3[i, j, k] <- temp$fracCresp  # fraction of loaded C respired
+      RT3[i, j, k] <- temp$RT  # residence time [day]
+      Qout3[i, j, k] <- temp$Qout  # outflow [m3 day-1]
+    }
+  }
 }
 
-#### (4) simulate over ranges of WA2LAs, zbars, and inflow DOC fraction labile
-fLs=seq(0.5,0,-0.01)		# fractions Labile considered
+# (4) simulate over ranges of WA2LAs, zbars, and inflow DOC fraction labile ----
+fLs <- seq(0.5, 0, -0.01)  # fractions Labile considered
 
-# 3-dimensional arrays to store output from simulations along gradients of drainage ratio, mean depth, and fraction labile
-RT3q=array(NA,dim=c(length(WA2LAs),length(fLs),length(zbars)))
-fracEvap3q=RT3q
-fracCresp3q=RT3q
-respiration3q=RT3q
-respirationVol3q=RT3q
-Cload3q=RT3q
-fracCresp3q=RT3q
-Qout3q=RT3q
-equilC3q=RT3q
+# 3-dimensional arrays to store output from simulations along gradients
+# of drainage ratio, mean depth, and fraction labile
+RT3q             <- array(NA, dim = c(length(WA2LAs),
+                                      length(fLs),
+                                      length(zbars)))
+fracEvap3q       <- RT3q
+fracCresp3q      <- RT3q
+respiration3q    <- RT3q
+respirationVol3q <- RT3q
+Cload3q          <- RT3q
+fracCresp3q      <- RT3q
+Qout3q           <- RT3q
+equilC3q         <- RT3q
 
 # loops to simulate across all gradients in a factorial manner
-for(i in 1:length(WA2LAs)){
-	for(j in 1:length(fLs)){
-		for(k in 1:length(zbars)){
-			temp=rateVfate(zbar=zbars[k],WA2LA=WA2LAs[i],fLabile=fLs[j])	
-			equilC3q[i,j,k]=temp$Cconc				# equilibrium DOC concentration [g m-3]
-			fracEvap3q[i,j,k]=temp$fracEvap		# fraction of hydrologic loss that is evap 
-			respiration3q[i,j,k]=temp$resp			# daily respiration [g day-1]
-			respirationVol3q[i,j,k]=temp$respVol	# daily volumetric respiration [g m-3 day-1]
-			Cload3q[i,j,k]=temp$Cload				# daily carbon load [g day-1]
-			fracCresp3q[i,j,k]=temp$fracCresp		# fraction of loaded C that is respired
-			RT3q[i,j,k]=temp$RT					# residence time [day]
-			Qout3q[i,j,k]=temp$Qout				# outflow [m3 day-1]
-		}
-	}
+for (i in 1:length(WA2LAs)) {
+  for (j in 1:length(fLs)) {
+    for (k in 1:length(zbars)) {
+      temp <- rateVfate(zbar = zbars[k], WA2LA = WA2LAs[i], fLabile = fLs[j])
+      equilC3q[i, j, k] <- temp$Cconc  # equilibrium DOC concentration [g m-3]
+      fracEvap3q[i, j, k] <- temp$fracEvap  # fraction of hydrologic loss that is evap
+      respiration3q[i, j, k] <- temp$resp  # daily respiration [g day-1]
+      respirationVol3q[i, j, k] <- temp$respVol  # daily volumetric respiration [g m-3 day-1]
+      Cload3q[i, j, k] <- temp$Cload  # daily carbon load [g day-1]
+      fracCresp3q[i, j, k] <- temp$fracCresp  # fraction of loaded C that is respired
+      RT3q[i, j, k] <- temp$RT  # residence time [day]
+      Qout3q[i, j, k] <- temp$Qout  # outflow [m3 day-1]
+    }
+  }
 }
 
-
-
-
-
-
-
 #*********************
-# Fig. 1 - proof of concept
+# Fig. 1 - proof of concept ----
 #*********************
 
 # a) RT - log v. log
@@ -263,7 +265,7 @@ abline(a=0,b=1,lty=5)
 #*********************
 # Fig 3 - rate v. fate
 #*********************
-# a) volumetric respiration 
+# a) volumetric respiration
 dev.new()
 plot(WA2LAs,respirationVol[,1],type='l',xlab="WA:LA",ylab="volumetric respiration (mg C m-3 day-1)",ylim=c(0,max(respirationVol)),lwd=2,col='grey90')
 lines(WA2LAs,respirationVol[,2],col='grey70',lwd=2)
