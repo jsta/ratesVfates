@@ -196,44 +196,66 @@ for (i in 1:length(WA2LAs)) {
 
 # a) RT - log v. log
 dev.new()
-plot(WA2LAs,RT[,1],type='l',xlab="log10(WA:LA)",ylab="log10(residence time) (days)",ylim=c(1,max(RT)),log="xy",lwd=2,col='grey90')
-lines(WA2LAs,RT[,2],lwd=2,col='grey70')
-lines(WA2LAs,RT[,5],lwd=2,col='grey55')
-lines(WA2LAs,RT[,10],lwd=2,col='grey40')
-lines(WA2LAs,RT[,15],lwd=2)
-legend('bottomleft',legend=c(1,2,5,10,15),lty=1,col=c('grey90','grey70','grey55','grey40','black'),box.lty=0)
-text(1,10,'mean depth (m)',font=4)
+plot(WA2LAs, RT[, 1], type = "l", xlab = "log10(WA:LA)",
+     ylab = "log10(residence time) (days)", ylim = c(1, max(RT)),
+     log = "xy", lwd = 2, col = "grey90")
+lines(WA2LAs, RT[, 2], lwd = 2, col = "grey70")
+lines(WA2LAs, RT[, 5], lwd = 2, col = "grey55")
+lines(WA2LAs, RT[, 10], lwd = 2, col = "grey40")
+lines(WA2LAs, RT[, 15], lwd = 2)
+legend("bottomleft", legend = c(1, 2, 5, 10, 15), lty = 1,
+       col = c("grey90", "grey70", "grey55", "grey40", "black"), box.lty = 0)
+text(1, 10, "mean depth (m)", font = 4)
+
 # b) areal C load
 dev.new()
-plot(WA2LAs,Cload[,1]/10000,type='l',xlab="WA:LA",ylab="carbon load (g m-2 day-1)",ylim=c(0,max(Cload/10000)))
+plot(WA2LAs, Cload[, 1]/10000, type = "l", xlab = "WA:LA",
+     ylab = "carbon load (g m-2 day-1)",
+     ylim = c(0, max(Cload/10000)))
 # c) equilibrium C concentration
 dev.new()
-plot(WA2LAs,equilC[,1],type='l',xlab="WA:LA",ylab="equilibrium carbon concentration (g m-3)",ylim=c(0,max(equilC)),lwd=2,col='grey95')
-lines(WA2LAs,equilC[,2],lwd=2,col='grey70')
-lines(WA2LAs,equilC[,5],lwd=2,col='grey55')
-lines(WA2LAs,equilC[,10],lwd=2,col='grey40')
-lines(WA2LAs,equilC[,15],lwd=2)
-legend('bottomright',legend=c(1,2,5,10,15),lty=1,col=c('grey90','grey70','grey55','grey40','black'),box.lty=0)
-text(900,1.4,'mean depth (m)',font=4)
+plot(WA2LAs, equilC[, 1], type = "l", xlab = "WA:LA",
+     ylab = "equilibrium carbon concentration (g m-3)",
+     ylim = c(0, max(equilC)), lwd = 2, col = "grey95")
+lines(WA2LAs, equilC[, 2], lwd = 2, col = "grey70")
+lines(WA2LAs, equilC[, 5], lwd = 2, col = "grey55")
+lines(WA2LAs, equilC[, 10], lwd = 2, col = "grey40")
+lines(WA2LAs, equilC[, 15], lwd = 2)
+legend("bottomright", legend = c(1, 2, 5, 10, 15), lty = 1,
+       col = c("grey90", "grey70", "grey55", "grey40", "black"), box.lty = 0)
+text(900, 1.4, "mean depth (m)", font = 4)
 
 #extra plots, a la Brett et al. 2012 fig 2a & b
 dev.new()
-plot(log10(WA2LAs*7.917808*1000/10000),log10(1/RT[,1]),xlab="Areal hydraulic load (L m-2 d-1)",ylab="flushign rate (day-1)",xlim=c(0,3),type='l',ylim=c(-4,0),lwd=2,col='grey90')
-lines(log10(WA2LAs*7.917808*1000/10000),log10(1/RT[,2]),lwd=2,col='grey70')
-lines(log10(WA2LAs*7.917808*1000/10000),log10(1/RT[,5]),lwd=2,col='grey55')
-lines(log10(WA2LAs*7.917808*1000/10000),log10(1/RT[,10]),lwd=2,col='grey40')
-lines(log10(WA2LAs*7.917808*1000/10000),log10(1/RT[,15]))
-lines(log10(seq(1,1000,10)),log10(0.0001*seq(1,1000,10)^1.084),col='red')	# model fit from Brett et al.
-legend('topleft',legend=c(1,2,5,10,15,"Brett et al."),lty=1,col=c('grey90','grey70','grey55','grey40','black','red'),box.lty=0)
+plot(log10(WA2LAs * 7.917808 * 1000/10000), log10(1/RT[, 1]),
+     xlab = "Areal hydraulic load (L m-2 d-1)",
+     ylab = "flushign rate (day-1)", xlim = c(0, 3), type = "l",
+     ylim = c(-4, 0), lwd = 2, col = "grey90")
+lines(log10(WA2LAs * 7.917808 * 1000/10000), log10(1/RT[, 2]), lwd = 2,
+      col = "grey70")
+lines(log10(WA2LAs * 7.917808 * 1000/10000), log10(1/RT[, 5]), lwd = 2,
+      col = "grey55")
+lines(log10(WA2LAs * 7.917808 * 1000/10000), log10(1/RT[, 10]), lwd = 2,
+      col = "grey40")
+lines(log10(WA2LAs * 7.917808 * 1000/10000), log10(1/RT[, 15]))
+lines(log10(seq(1, 1000, 10)), log10(1e-04 * seq(1, 1000, 10)^1.084),
+      col = "red")  # model fit from Brett et al.
+legend("topleft", legend = c(1, 2, 5, 10, 15, "Brett et al."), lty = 1,
+       col = c("grey90", "grey70", "grey55", "grey40", "black", "red"),
+       box.lty = 0)
 
 dev.new()
-plot(log10(WA2LAs*7.917808*1000/10000),log10(Cload[,1]/10000*1000),type='l',xlab="Areal hydraulic load (L m-2 d-1)",ylab="carbon load (mg m-2 day-1)",xlim=c(0,3),lwd=2)
-lines(log10(seq(1,1000,10)),log10(8.37*seq(1,1000,10)^0.982),lwd=2,col='red')
-legend('topleft',c('this study','Brett et al. 2012'),lty=1,col=c('black','red'),box.lty=0)
-
+plot(log10(WA2LAs * 7.917808 * 1000/10000), log10(Cload[, 1]/10000 * 1000),
+     type = "l", xlab = "Areal hydraulic load (L m-2 d-1)",
+     ylab = "carbon load (mg m-2 day-1)",
+     xlim = c(0, 3), lwd = 2)
+lines(log10(seq(1, 1000, 10)), log10(8.37 * seq(1, 1000, 10)^0.982), lwd = 2,
+      col = "red")
+legend("topleft", c("this study", "Brett et al. 2012"), lty = 1,
+       col = c("black", "red"), box.lty = 0)
 
 #*********************
-# Fig 2 - evaporation matters
+# Fig 2 - evaporation matters ----
 #*********************
 
 # a) frac evap
@@ -263,7 +285,7 @@ arrows(x0=fracCresp[(nrow(fracCresp)-50),15],y0=fracCrespNE[(nrow(fracCrespNE)-5
 abline(a=0,b=1,lty=5)
 
 #*********************
-# Fig 3 - rate v. fate
+# Fig 3 - rate v. fate ----
 #*********************
 # a) volumetric respiration
 dev.new()
@@ -296,7 +318,7 @@ text(0.002,0.26,'mean depth (m)',font=4)
 
 
 #*********************
-# Fig 4 - multi-line graph - RT v. frac C resp
+# Fig 4 - multi-line graph - RT v. frac C resp ----
 #*********************
 dev.new()
 plot(RT[1,],fracCresp[1,],type='l',xlim=c(1,10000),ylim=c(0,1),xlab="residence time (days)",ylab="fraction C load decomposed",lwd=2,log="x",col='black')	#WA2LA=0.5
@@ -311,10 +333,9 @@ lines(RT[2000,],fracCresp[2000,],lwd=2,col='red')	#WA2LA=1000
 
 legend('topleft',c('DR=0.5','DR=1','DR=2','DR=5','DR=10','DR=50','DR=100','DR=500','DR=1000'),lty=1,col=c('black','purple','blue','darkgreen','green','yellow','orange','pink','red'),box.lty=0)
 
-
-###############
-# Figure 5 - quantity and quality effects
-###############
+#*********************
+# Fig. 5 - quantity and quality effects ----
+#*********************
 # a & b) effect of Cq (DOC concentratio in inflow) and C quality (fraction recalcitrant)
 dev.new()
 par(mfrow=c(1,2))
